@@ -1,0 +1,62 @@
+### Get all
+GET http://localhost:3000/books
+Content-Type: application/json
+Authorization: Bearer ${{token}}
+
+
+### Get one
+GET http://localhost:3000/books/6575c6c68392ef68a2aba37b
+Content-Type: application/json
+Authorization: Bearer ${{token}}
+
+
+### Create
+POST http://localhost:3000/books
+Content-Type: application/json
+Authorization: Bearer ${{token}}
+
+{
+  "title": "1984",
+  "author": "George Orwell",
+  "publicationYear": 2023
+}
+
+
+### Create
+POST http://localhost:3000/books
+Content-Type: application/json
+Authorization: Bearer ${{token}}
+
+{
+  "title": "War and Peace",
+  "author": "Lev Tolstoi",
+  "publicationYear": 1867
+}
+
+
+### Update
+PUT http://localhost:3000/books/6575c971fb9eb39315293236
+Content-Type: application/json
+Authorization: Bearer ${{token}}
+
+{
+  "title": "War and Peace",
+  "author": "Lev Tolstoy",
+  "publicationYear": 1867
+}
+
+
+### Partially update
+PATCH http://localhost:3000/books/6575cc887558637cbeab4b67
+Content-Type: application/json
+Authorization: Bearer ${{token}}
+
+{
+  "publicationYear": 1947
+}
+
+
+### Delete
+DELETE http://localhost:3000/books/6575c971fb9eb39315293236
+Content-Type: application/json
+Authorization: Bearer ${{token}}
