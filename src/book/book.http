@@ -1,17 +1,17 @@
 ### Get all
-GET http://localhost:3000/books
+GET http://localhost:3000/api/books
 Content-Type: application/json
 Authorization: Bearer ${{token}}
 
 
 ### Get one
-GET http://localhost:3000/books/6575c6c68392ef68a2aba37b
+GET http://localhost:3000/api/books/6575cc887558637cbeab4b67
 Content-Type: application/json
 Authorization: Bearer ${{token}}
 
 
 ### Create
-POST http://localhost:3000/books
+POST http://localhost:3000/api/books
 Content-Type: application/json
 Authorization: Bearer ${{token}}
 
@@ -23,19 +23,17 @@ Authorization: Bearer ${{token}}
 
 
 ### Create
-POST http://localhost:3000/books
+POST http://localhost:3000/api/books
 Content-Type: application/json
 Authorization: Bearer ${{token}}
 
 {
-  "title": "War and Peace",
-  "author": "Lev Tolstoi",
   "publicationYear": 1867
 }
 
 
 ### Update
-PUT http://localhost:3000/books/6575c971fb9eb39315293236
+PUT http://localhost:3000/api/books/6575c971fb9eb39315293236
 Content-Type: application/json
 Authorization: Bearer ${{token}}
 
@@ -47,7 +45,7 @@ Authorization: Bearer ${{token}}
 
 
 ### Partially update
-PATCH http://localhost:3000/books/6575cc887558637cbeab4b67
+PATCH http://localhost:3000/api/books/6575cc887558637cbeab4b67
 Content-Type: application/json
 Authorization: Bearer ${{token}}
 
@@ -57,6 +55,6 @@ Authorization: Bearer ${{token}}
 
 
 ### Delete
-DELETE http://localhost:3000/books/6575c971fb9eb39315293236
+DELETE http://localhost:3000/api/books/6575c971fb9eb39315293232
 Content-Type: application/json
 Authorization: Bearer ${{token}}

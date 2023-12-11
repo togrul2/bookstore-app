@@ -10,33 +10,47 @@ import {
   Post,
   Put,
   Res,
-  UsePipes,
-  ValidationPipe,
 } from '@nestjs/common';
 import { BookService } from './book.service';
-import { CreateBookDto } from './dto/books.dto.create';
+import { BookDto, CreateBookDto, UpdateBookDto } from './books.dto';
 import { Response } from 'express';
 import { Book } from './book.schema';
 import { ObjectId } from 'mongodb';
-import { ParseObjectIdPipe } from '../app.pipe';
+import {
+  ApiBadRequestResponse,
+  ApiCreatedResponse,
+  ApiNoContentResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { BadRequestErrorDto, ErrorDto } from '../app.dto';
 
-@Controller('/books')
+@ApiTags('book')
+@Controller('api/books')
 export class BookController {
   constructor(private readonly booksService: BookService) {}
 
   @Get()
+  @ApiOkResponse({ type: [BookDto], description: 'Books found' })
   public async findAll(): Promise<Book[]> {
     return await this.booksService.findAll();
   }
 
   @Get(':id')
-  public findById(@Param('id', ParseObjectIdPipe) id: ObjectId): Promise<Book> {
+  @ApiNotFoundResponse({ type: ErrorDto, description: 'Book not found' })
+  @ApiOkResponse({ type: BookDto, description: 'Book found' })
+  public findById(@Param('id') id: ObjectId): Promise<Book> {
     return this.booksService.findById(id);
   }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @UsePipes(new ValidationPipe({ transform: true }))
+  @ApiCreatedResponse({ type: BookDto, description: 'Book created' })
+  @ApiBadRequestResponse({
+    type: BadRequestErrorDto,
+    description: 'Bad request',
+  })
   public async createBook(
     @Res() res: Response,
     @Body() book: CreateBookDto,
@@ -48,28 +62,38 @@ export class BookController {
   }
 
   @Put(':id')
-  @UsePipes(new ValidationPipe({ transform: true }))
+  @ApiOkResponse({ type: BookDto, description: 'Book updated' })
+  @ApiNotFoundResponse({ type: ErrorDto, description: 'Book not found' })
+  @ApiBadRequestResponse({
+    type: BadRequestErrorDto,
+    description: 'Bad request',
+  })
   public updateBook(
-    @Param('id', ParseObjectIdPipe) id: ObjectId,
+    @Param('id') id: ObjectId,
     @Body() bookDto: CreateBookDto,
   ): Promise<Book> {
     return this.booksService.updateBook(id, bookDto);
   }
 
   @Patch(':id')
-  @UsePipes(new ValidationPipe({ transform: true }))
+  @ApiOkResponse({ type: BookDto, description: 'Book updated' })
+  @ApiNotFoundResponse({ type: ErrorDto, description: 'Book not found' })
+  @ApiBadRequestResponse({
+    type: BadRequestErrorDto,
+    description: 'Bad request',
+  })
   public partiallyUpdateBook(
-    @Param('id', ParseObjectIdPipe) id: ObjectId,
-    @Body() bookDto: Partial<CreateBookDto>,
+    @Param('id') id: ObjectId,
+    @Body() bookDto: UpdateBookDto,
   ): Promise<Book> {
     return this.booksService.updateBook(id, bookDto);
   }
 
-  @Delete('/:id')
+  @Delete(':id')
+  @ApiNoContentResponse({ type: ErrorDto, description: 'Book deleted' })
+  @ApiNotFoundResponse({ type: ErrorDto, description: 'Book not found' })
   @HttpCode(HttpStatus.NO_CONTENT)
-  public async deleteBook(
-    @Param('id', ParseObjectIdPipe) id: ObjectId,
-  ): Promise<void> {
+  public async deleteBook(@Param('id') id: ObjectId): Promise<void> {
     await this.booksService.deleteBook(id);
   }
 }
