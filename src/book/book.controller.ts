@@ -15,7 +15,6 @@ import { BookService } from './book.service';
 import { BookDto, CreateBookDto, UpdateBookDto } from './books.dto';
 import { Response } from 'express';
 import { Book } from './book.schema';
-import { ObjectId } from 'mongodb';
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
@@ -25,6 +24,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { BadRequestErrorDto, ErrorDto } from '../app.dto';
+import { ObjectIdValidationPipe } from '../app.pipe';
 
 @ApiTags('book')
 @Controller('books')
@@ -40,7 +40,9 @@ export class BookController {
   @Get(':id')
   @ApiNotFoundResponse({ type: ErrorDto, description: 'Book not found' })
   @ApiOkResponse({ type: BookDto, description: 'Book found' })
-  public findById(@Param('id') id: ObjectId): Promise<Book> {
+  public findById(
+    @Param('id', ObjectIdValidationPipe) id: string,
+  ): Promise<Book> {
     return this.booksService.findById(id);
   }
 
@@ -69,7 +71,7 @@ export class BookController {
     description: 'Bad request',
   })
   public updateBook(
-    @Param('id') id: ObjectId,
+    @Param('id', ObjectIdValidationPipe) id: string,
     @Body() bookDto: CreateBookDto,
   ): Promise<Book> {
     return this.booksService.updateBook(id, bookDto);
@@ -83,7 +85,7 @@ export class BookController {
     description: 'Bad request',
   })
   public partiallyUpdateBook(
-    @Param('id') id: ObjectId,
+    @Param('id', ObjectIdValidationPipe) id: string,
     @Body() bookDto: UpdateBookDto,
   ): Promise<Book> {
     return this.booksService.updateBook(id, bookDto);
@@ -93,7 +95,9 @@ export class BookController {
   @ApiNoContentResponse({ type: ErrorDto, description: 'Book deleted' })
   @ApiNotFoundResponse({ type: ErrorDto, description: 'Book not found' })
   @HttpCode(HttpStatus.NO_CONTENT)
-  public async deleteBook(@Param('id') id: ObjectId): Promise<void> {
+  public async deleteBook(
+    @Param('id', ObjectIdValidationPipe) id: string,
+  ): Promise<void> {
     await this.booksService.deleteBook(id);
   }
 }

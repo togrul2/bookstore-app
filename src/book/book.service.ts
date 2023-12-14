@@ -3,7 +3,15 @@ import { CreateBookDto } from './books.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Book } from './book.schema';
 import { Model } from 'mongoose';
-import { ObjectId } from 'mongodb';
+
+/**
+ * Custom 404 not found exception for book entity.
+ */
+class BookNotFoundException extends NotFoundException {
+  constructor(id: string) {
+    super(`Book with id ${id} not found`);
+  }
+}
 
 @Injectable()
 export class BookService {
@@ -20,18 +28,18 @@ export class BookService {
     return await createdBook.save();
   }
 
-  public async findById(id: ObjectId): Promise<Book> {
+  public async findById(id: string): Promise<Book> {
     const book = await this.bookModel.findById(id).select(['-__v']);
 
     if (book === null) {
-      throw new NotFoundException('Book not found.');
+      throw new BookNotFoundException(id);
     }
 
     return book;
   }
 
   public async updateBook(
-    id: ObjectId,
+    id: string,
     dto: Partial<CreateBookDto>,
   ): Promise<Book> {
     const book = await this.bookModel
@@ -39,17 +47,17 @@ export class BookService {
       .select(['-__v']);
 
     if (book === null) {
-      throw new NotFoundException('Book not found!');
+      throw new BookNotFoundException(id);
     }
 
     return book;
   }
 
-  public async deleteBook(id: ObjectId): Promise<void> {
-    if ((await this.bookModel.findById(id).exec()) == null) {
+  public async deleteBook(id: string): Promise<void> {
+    const res = await this.bookModel.findByIdAndDelete(id);
+
+    if (res === null) {
       throw new NotFoundException('Book not found');
     }
-
-    await this.bookModel.findByIdAndDelete(id);
   }
 }
