@@ -1,7 +1,11 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { BadRequestException, ValidationPipe } from '@nestjs/common';
+import {
+  BadRequestException,
+  ValidationPipe,
+  VersioningType,
+} from '@nestjs/common';
 import { LoggingInterceptor } from './app.interceptor';
 
 async function bootstrap() {
@@ -13,6 +17,11 @@ async function bootstrap() {
       exceptionFactory: (errors) => new BadRequestException(errors),
     }),
   );
+  app.enableVersioning({
+    type: VersioningType.URI,
+    prefix: 'api/',
+    defaultVersion: 'v1',
+  });
   app.useGlobalInterceptors(new LoggingInterceptor());
 
   // Swagger doc config builder.

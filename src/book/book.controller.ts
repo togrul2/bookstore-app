@@ -27,7 +27,7 @@ import {
 import { BadRequestErrorDto, ErrorDto } from '../app.dto';
 
 @ApiTags('book')
-@Controller('api/books')
+@Controller('books')
 export class BookController {
   constructor(private readonly booksService: BookService) {}
 
