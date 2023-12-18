@@ -10,6 +10,7 @@ import { LoggingInterceptor } from './app.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.setGlobalPrefix('api');
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
@@ -19,15 +20,14 @@ async function bootstrap() {
   );
   app.enableVersioning({
     type: VersioningType.URI,
-    prefix: 'api/',
-    defaultVersion: 'v1',
+    defaultVersion: '1',
   });
   app.useGlobalInterceptors(new LoggingInterceptor());
 
   // Swagger doc config builder.
   const config = new DocumentBuilder()
     .setTitle('Book app')
-    .setDescription('App for managing book storage')
+    .setDescription('App for managing book storage.')
     .setVersion('1.0')
     .build();
   const document = SwaggerModule.createDocument(app, config);

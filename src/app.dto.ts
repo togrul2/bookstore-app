@@ -1,3 +1,4 @@
+// TODO: separate DTOs and entities. DTOs must be used for write operations only.
 /**
  * Error DTO. Must be used for swagger only.
  */
