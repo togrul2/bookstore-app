@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Request, Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import {
   ApiCreatedResponse,
@@ -8,6 +8,9 @@ import {
 import { LoginDto } from './auth.dto';
 import { TokenPairEntity } from './auth.entity';
 import { ErrorDto } from '../app.dto';
+import {JwtAuthGuard, JwtRefreshGuard, LocalAuthGuard} from './auth.guard';
+import { Request as Req} from 'express';
+import {AuthGuard} from '@nestjs/passport';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -25,5 +28,11 @@ export class AuthController {
   })
   public async login(@Body() credentials: LoginDto): Promise<TokenPairEntity> {
     return await this.authService.loginJwt(credentials);
+  }
+
+  @Post('refresh')
+  @UseGuards(AuthGuard('local'))
+  public async refresh(@Request() req: Req) {
+    return req.user;
   }
 }

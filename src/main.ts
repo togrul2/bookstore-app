@@ -1,15 +1,18 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import {
   BadRequestException,
+  ClassSerializerInterceptor,
   ValidationPipe,
   VersioningType,
 } from '@nestjs/common';
 import { LoggingInterceptor } from './app.interceptor';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const configService = app.get(ConfigService);
   app.setGlobalPrefix('api');
   app.useGlobalPipes(
     new ValidationPipe({
@@ -23,7 +26,7 @@ async function bootstrap() {
     defaultVersion: '1',
   });
   app.useGlobalInterceptors(new LoggingInterceptor());
-
+  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
   // Swagger doc config builder.
   const config = new DocumentBuilder()
     .setTitle('Book app')
@@ -32,7 +35,9 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs/', app, document);
-  await app.listen(3000);
+
+  // Start the app.
+  await app.listen(configService.get<number>('PORT', 3000));
 }
 
 bootstrap();

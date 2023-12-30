@@ -1,4 +1,3 @@
-// TODO: separate DTOs and entities. DTOs must be used for write operations only.
 /**
  * Error DTO. Must be used for swagger only.
  */
@@ -11,7 +10,7 @@ export class ErrorDto {
 /**
  * Field error DTO. Must be used for swagger only.
  */
-export class FieldError {
+class FieldError {
   target: any;
   property: string;
   children: any[];

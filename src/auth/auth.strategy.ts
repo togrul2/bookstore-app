@@ -5,6 +5,22 @@ import { ExtractJwt } from 'passport-jwt';
 import { JwtPayload, JwtRefreshPayload } from './auth.type';
 import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
+import { User } from '../user/user.schema';
+import { AuthService } from './auth.service';
+
+export class LocalStrategy extends PassportStrategy(Passport, 'local') {
+  public constructor(private readonly authService: AuthService) {
+    super();
+  }
+
+  public async validate(username: string, password: string): Promise<User> {
+    const user = await this.authService.validateUser(username, password);
+
+    if (!user) throw new UnauthorizedException('Invalid credentials!');
+
+    return user;
+  }
+}
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Passport, 'jwt') {
@@ -24,7 +40,7 @@ export class JwtStrategy extends PassportStrategy(Passport, 'jwt') {
 @Injectable()
 export class RefreshJwtStrategy extends PassportStrategy(
   Passport,
-  'refresh-jwt',
+  'jwt-refresh',
 ) {
   public constructor(private readonly configService: ConfigService) {
     super({
