@@ -1,19 +1,21 @@
 import { Module } from '@nestjs/common';
-import { UserService } from './user.service';
+import { UsersService } from './users.service';
+import { UsersController } from './users.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { User, UserSchema } from './user.schema';
-import { UserController } from './user.controller';
 import { genSalt, hash } from 'bcrypt';
-import { UserRepository } from './user.repository';
+import { UsersRepository } from './users.repository';
+import { User, UserSchema } from './entities/user.entity';
 
 @Module({
-  providers: [UserService, UserRepository],
+  controllers: [UsersController],
+  providers: [UsersService, UsersRepository],
+  exports: [UsersRepository],
   imports: [
     MongooseModule.forFeatureAsync([
       {
         name: User.name,
         useFactory: () => {
-          UserSchema.pre<User>('save', function (next) {
+          UserSchema.pre<User>('save', function (next: any) {
             genSalt(10).then((salt) => {
               hash(this.password, salt, (err, hash) => {
                 if (err) return next(err);
@@ -27,7 +29,5 @@ import { UserRepository } from './user.repository';
       },
     ]),
   ],
-  controllers: [UserController],
-  exports: [UserRepository],
 })
-export class UserModule {}
+export class UsersModule {}

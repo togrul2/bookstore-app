@@ -3,8 +3,8 @@ import { BookModule } from './book/book.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './auth/auth.module';
-import { UserModule } from './user/user.module';
 import { AuthorsModule } from './authors/authors.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -17,9 +17,9 @@ import { AuthorsModule } from './authors/authors.module';
       }),
       inject: [ConfigService],
     }),
-    AuthModule,
-    UserModule,
     AuthorsModule,
+    AuthModule,
+    UsersModule,
   ],
 })
 export class AppModule {}

@@ -5,27 +5,16 @@ import {
   NotFoundException,
   ValidationError,
 } from '@nestjs/common';
-import { CreateUserDto, UpdatePasswordDto, UpdateUserDto } from './user.dto';
-import { User } from './user.schema';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { UsersRepository } from './users.repository';
+import { User } from './entities/user.entity';
 import { compare } from 'bcrypt';
-import { UserRepository } from './user.repository';
-
-class UserNotFoundException extends NotFoundException {
-  public constructor(id: string) {
-    super(`User with id '${id}' not found`);
-  }
-}
+import { UpdatePasswordDto } from './dto/update-password.dto';
 
 @Injectable()
-export class UserService {
-  public constructor(private readonly userRepository: UserRepository) {}
-
-  /**
-   * Returns all users.
-   */
-  public async getUsers(): Promise<User[]> {
-    return this.userRepository.getUsers();
-  }
+export class UsersService {
+  public constructor(private readonly usersRepository: UsersRepository) {}
 
   /**
    * Validates user data.
@@ -41,7 +30,7 @@ export class UserService {
 
     if (
       dto.username &&
-      (await this.userRepository.existsByUsername(dto.username, userId))
+      (await this.usersRepository.existsByUsername(dto.username, userId))
     ) {
       errors.push({
         property: 'username',
@@ -55,7 +44,7 @@ export class UserService {
 
     if (
       dto.email &&
-      (await this.userRepository.existsByEmail(dto.email, userId))
+      (await this.usersRepository.existsByEmail(dto.email, userId))
     ) {
       errors.push({
         property: 'email',
@@ -75,51 +64,47 @@ export class UserService {
    * @param createUserDto User data transfer object.
    * @throws BadRequestException If user data is invalid.
    */
-  public async createUser(createUserDto: CreateUserDto): Promise<User> {
+  public async create(createUserDto: CreateUserDto): Promise<User> {
     await this.validateUserData(createUserDto);
-    return this.userRepository.createUser(createUserDto);
+    return this.usersRepository.createUser(createUserDto);
   }
 
-  /**
-   * Returns user with given id.
-   * @param id User id.
-   */
-  public async getUserById(id: string): Promise<User> {
-    const user = await this.userRepository.getUserById(id);
+  public async findAll(): Promise<User[]> {
+    return this.usersRepository.getUsers();
+  }
 
-    if (user === null) throw new UserNotFoundException(id);
-
+  public async findOne(id: string): Promise<User> {
+    const user = await this.usersRepository.getUserById(id);
+    if (user === null) throw new BadRequestException();
     return user;
   }
 
-  public async updateUser(
+  public async update(
     id: string,
     updateUserDto: Partial<UpdateUserDto>,
   ): Promise<User> {
     await this.validateUserData(updateUserDto, id);
-    const user = await this.userRepository.updateUser(id, updateUserDto);
-
-    if (user === null) throw new UserNotFoundException(id);
-
+    const user = await this.usersRepository.updateUser(id, updateUserDto);
+    if (user === null) throw new NotFoundException();
     return user;
   }
 
-  public async deleteUser(id: string): Promise<void> {
-    if ((await this.userRepository.deleteUser(id)) === null)
-      throw new UserNotFoundException(id);
+  public async remove(id: string): Promise<void> {
+    if ((await this.usersRepository.deleteUser(id)) === null)
+      throw new NotFoundException();
   }
 
   public async updatePassword(
     id: string,
     updatePasswordDto: UpdatePasswordDto,
   ): Promise<void> {
-    const user = await this.userRepository.getUserById(id);
-    if (user === null) throw new UserNotFoundException(id);
+    const user = await this.usersRepository.getUserById(id);
+    if (user === null) throw new NotFoundException();
 
     if (!(await compare(updatePasswordDto.currentPassword, user.password)))
       throw new ForbiddenException('Invalid current password.');
 
-    await this.userRepository.updateUser(id, {
+    await this.usersRepository.updateUser(id, {
       password: updatePasswordDto.newPassword,
     });
   }

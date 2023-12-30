@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PassportModule } from '@nestjs/passport';
+import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import {
@@ -7,15 +9,13 @@ import {
   LocalStrategy,
   RefreshJwtStrategy,
 } from './auth.strategy';
-import { JwtModule } from '@nestjs/jwt';
-import { UserModule } from '../user/user.module';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   controllers: [AuthController],
   providers: [AuthService, LocalStrategy, JwtStrategy, RefreshJwtStrategy],
   imports: [
-    UserModule,
+    UsersModule,
     ConfigModule,
     PassportModule,
     JwtModule.registerAsync({

@@ -5,7 +5,7 @@ import { ExtractJwt } from 'passport-jwt';
 import { JwtPayload, JwtRefreshPayload } from './auth.type';
 import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
-import { User } from '../user/user.schema';
+import { User } from '../users/entities/user.entity';
 import { AuthService } from './auth.service';
 
 export class LocalStrategy extends PassportStrategy(Passport, 'local') {

@@ -17,7 +17,7 @@ import { AuthorsService } from './authors.service';
 import { CreateAuthorDto } from './dto/create-author.dto';
 import { UpdateAuthorDto } from './dto/update-author.dto';
 import { ObjectIdValidationPipe } from '../app.pipe';
-import { AuthorEntity } from './author.entity';
+import { AuthorEntity } from './author.serializer';
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
