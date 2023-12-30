@@ -60,7 +60,7 @@ export class LoggingInterceptor implements NestInterceptor {
 
 @Injectable()
 /**
- * Interceptor for adding Location header to response.
+ * Interceptor that adds Location header to response.
  * Must be used with http post method controller that creates resource.
  * @class
  * @public

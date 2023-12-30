@@ -1,26 +1,28 @@
 import { Exclude } from 'class-transformer';
+import { Gender } from './entities/user.entity';
 
 export class UserEntity {
   id: string;
   email: string;
-  firstName: string;
-  lastName: string;
+  gender: Gender | null;
+  birthDate: Date;
+  username: string;
   fullName: string;
   @Exclude()
   password: string;
-  createdAt: Date;
-  updatedAt: Date;
+  @Exclude()
+  isBanned: boolean;
 
   static from(dto: Partial<UserEntity>): UserEntity {
     return new UserEntity({
       id: dto.id,
-      email: dto.email,
-      firstName: dto.firstName,
-      lastName: dto.lastName,
       fullName: dto.fullName,
+      username: dto.username,
+      email: dto.email,
+      gender: dto.gender,
+      birthDate: dto.birthDate,
       password: dto.password,
-      createdAt: dto.createdAt,
-      updatedAt: dto.updatedAt,
+      isBanned: dto.isBanned,
     });
   }
 

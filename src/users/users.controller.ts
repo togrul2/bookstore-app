@@ -22,6 +22,7 @@ import {
   ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiTags,
   // ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { BadRequestErrorDto, ErrorDto } from '../app.dto';
@@ -29,6 +30,7 @@ import { LocationHeaderInterceptor } from '../app.interceptor';
 import { ObjectIdValidationPipe } from '../app.pipe';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 
+@ApiTags('users')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -39,7 +41,7 @@ export class UsersController {
     type: BadRequestErrorDto,
     description: 'Validation error',
   })
-  @UseInterceptors(new LocationHeaderInterceptor('/api/v1/users'))
+  @UseInterceptors(new LocationHeaderInterceptor('api/v1/users'))
   public async create(
     @Body() createUserDto: CreateUserDto,
   ): Promise<UserEntity> {

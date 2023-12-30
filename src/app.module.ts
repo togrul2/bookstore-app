@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { BookModule } from './book/book.module';
+import { BooksModule } from './books/books.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './auth/auth.module';
@@ -8,7 +8,7 @@ import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
-    BookModule,
+    BooksModule,
     ConfigModule.forRoot({ envFilePath: '.env' }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
