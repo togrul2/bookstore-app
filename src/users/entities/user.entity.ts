@@ -1,14 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Types } from 'mongoose';
 
-export enum Gender {
-  MALE = 'M',
-  FEMALE = 'F',
-}
+export type Gender = 'M' | 'F';
 
 @Schema({ timestamps: true })
 export class User {
-  @Prop({ required: true, unique: true, index: true })
-  username: string;
+  _id: Types.ObjectId;
 
   @Prop({ required: true, unique: true, index: true })
   email: string;
@@ -16,7 +13,7 @@ export class User {
   @Prop({ required: true })
   fullName: string;
 
-  @Prop({ type: String, enum: Gender, default: null })
+  @Prop({ type: String })
   gender: Gender | null;
 
   @Prop({ required: true })

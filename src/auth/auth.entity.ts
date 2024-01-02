@@ -1,11 +1,9 @@
-import { IsNotEmpty, IsString } from 'class-validator';
-
+/**
+ * Token pair entity.
+ * @property accessToken Access token.
+ * @property refreshToken Refresh token.
+ */
 export class TokenPairEntity {
-  @IsString()
-  @IsNotEmpty()
   accessToken: string;
-
-  @IsNotEmpty()
-  @IsString()
   refreshToken: string;
 }

@@ -35,8 +35,8 @@ export class UsersRepository {
     return new this.userModel(createUserDto, ['-__v']).save();
   }
 
-  public async getUserByUsername(username: string): Promise<User | null> {
-    return this.userModel.findOne({ username }).select(['-__v']).exec();
+  public async getUserByEmail(email: string): Promise<User | null> {
+    return this.userModel.findOne({ email }).select(['-__v']).exec();
   }
 
   public async updateUser(

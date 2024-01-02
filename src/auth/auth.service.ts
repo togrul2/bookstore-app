@@ -1,12 +1,23 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { compare } from 'bcrypt';
 import { TokenPairEntity } from './auth.entity';
-import { LoginDto } from './auth.dto';
-import { ConfigService } from '@nestjs/config';
+import { LoginDto } from './dto/login.dto';
 import { UsersRepository } from '../users/users.repository';
 import { User } from '../users/entities/user.entity';
 
+/**
+ * Service responsible for authentication.
+ * @version 1.0.0
+ * @see UsersRepository
+ * @see JwtService
+ * @see ConfigService
+ * @see User
+ * @see TokenPairEntity
+ * @see LoginDto
+ * @see UnauthorizedException
+ */
 @Injectable()
 export class AuthService {
   constructor(
@@ -24,55 +35,56 @@ export class AuthService {
     username: string,
     password: string,
   ): Promise<User | null> {
-    const user = await this.userRepository.getUserByUsername(username);
+    const user = await this.userRepository.getUserByEmail(username);
 
     if (user && (await compare(password, user.password))) return user;
 
     return null;
   }
 
-  /**
-   * Generate access and refresh token pair for given user.
-   * @param credentials User's credentials payload.
-   */
-  public async loginJwt(credentials: LoginDto): Promise<TokenPairEntity> {
-    const user = await this.validateUser(
-      credentials.username,
-      credentials.password,
-    );
-    const isPasswordMatching = await compare(
-      credentials.password,
-      user?.password || '',
-    );
+  public async refreshTokens(refreshToken: string): Promise<TokenPairEntity> {
+    let id, type;
 
-    if (!user || !isPasswordMatching)
-      throw new UnauthorizedException('Invalid credentials!');
+    // Decode refresh token and extract user id and token type from its payload.
+    try {
+      const payload = await this.jwtService.decode(refreshToken);
+      id = payload['id'];
+      type = payload['type'];
+    } catch (e) {
+      throw new UnauthorizedException('Invalid refresh token.');
+    }
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    return this.generateTokenPair(user._id, user.username);
+    // Check token type and user id.
+    if (type !== 'refresh' || id === undefined)
+      throw new UnauthorizedException('Invalid refresh token.');
+
+    // Check if user with given id exists.
+    const user = await this.userRepository.getUserById(id);
+    if (user === null)
+      throw new UnauthorizedException('Invalid refresh token.');
+
+    return this.createTokenPair(user);
   }
 
-  /**
-   * Generate access and refresh token pair for given user.
-   * @param id User's id.
-   * @param username User's username.
-   * @private
-   */
-  private async generateTokenPair(
-    id: string,
-    username: string,
-  ): Promise<TokenPairEntity> {
-    const jwtPayload = { id, username };
+  public async login(loginDto: LoginDto): Promise<TokenPairEntity> {
+    const user = await this.validateUser(loginDto.email, loginDto.password);
+    if (user === null) throw new UnauthorizedException();
+    return this.createTokenPair(user);
+  }
+
+  private async createTokenPair(user: User): Promise<TokenPairEntity> {
     const [accessToken, refreshToken] = await Promise.all([
-      this.jwtService.signAsync(jwtPayload, {
-        secret: this.configService.get<string>('JWT_SECRET_ACCESS_KEY'),
-        expiresIn: this.configService.get<string>('JWT_ACCESS_TOKEN_TTL'),
+      this.jwtService.signAsync({
+        id: user._id,
+        email: user.email,
+        type: 'access',
       }),
-      this.jwtService.signAsync(jwtPayload, {
-        secret: this.configService.get<string>('JWT_SECRET_REFRESH_KEY'),
-        expiresIn: this.configService.get<string>('JWT_REFRESH_TOKEN_TTL'),
-      }),
+      this.jwtService.signAsync(
+        { id: user._id, email: user.email, type: 'refresh' },
+        {
+          expiresIn: this.configService.get<string>('JWT_REFRESH_TOKEN_TTL'),
+        },
+      ),
     ]);
 
     return { accessToken, refreshToken };

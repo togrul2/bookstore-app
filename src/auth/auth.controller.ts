@@ -1,16 +1,13 @@
-import { Request, Body, Controller, Post, UseGuards } from '@nestjs/common';
-import { AuthService } from './auth.service';
+import { Controller, Body, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import {
-  ApiCreatedResponse,
+  ApiOkResponse,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { LoginDto } from './auth.dto';
-import { TokenPairEntity } from './auth.entity';
 import { ErrorDto } from '../app.dto';
-// import { JwtAuthGuard, JwtRefreshGuard, LocalAuthGuard } from './auth.guard';
-import { Request as Req } from 'express';
-import { AuthGuard } from '@nestjs/passport';
+import { AuthService } from './auth.service';
+import { TokenPairEntity } from './auth.entity';
+import { LoginDto, RefreshDto } from './dto/login.dto';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -18,7 +15,8 @@ export class AuthController {
   public constructor(private readonly authService: AuthService) {}
 
   @Post('login')
-  @ApiCreatedResponse({
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({
     type: TokenPairEntity,
     description: 'Access & refresh token pair.',
   })
@@ -26,13 +24,23 @@ export class AuthController {
     type: ErrorDto,
     description: 'Invalid credentials.',
   })
-  public async login(@Body() credentials: LoginDto): Promise<TokenPairEntity> {
-    return await this.authService.loginJwt(credentials);
+  public async login(@Body() loginDto: LoginDto): Promise<TokenPairEntity> {
+    return this.authService.login(loginDto);
   }
 
   @Post('refresh')
-  @UseGuards(AuthGuard('local'))
-  public async refresh(@Request() req: Req) {
-    return req.user;
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({
+    type: TokenPairEntity,
+    description: 'Access & refresh token pair.',
+  })
+  @ApiUnauthorizedResponse({
+    type: ErrorDto,
+    description: 'Invalid refresh token.',
+  })
+  public async refresh(
+    @Body() refreshDto: RefreshDto,
+  ): Promise<TokenPairEntity> {
+    return this.authService.refreshTokens(refreshDto.refreshToken);
   }
 }
