@@ -194,6 +194,6 @@ export class AuthorsController {
   public async remove(
     @Param('id', ObjectIdValidationPipe) id: string,
   ): Promise<void> {
-    return this.authorsService.remove(id);
+    await this.authorsService.remove(id);
   }
 }

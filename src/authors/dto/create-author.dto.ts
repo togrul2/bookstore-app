@@ -24,3 +24,19 @@ export class CreateAuthorDto {
   @IsString()
   biography: string;
 }
+
+export function createAuthorDtoFactory(
+  fullName: string,
+  dateOfBirth: Date,
+  dateOfDeath: Date | null,
+  nationality: string,
+  biography: string,
+) {
+  const createAuthorDto = new CreateAuthorDto();
+  createAuthorDto.fullName = fullName;
+  createAuthorDto.dateOfBirth = dateOfBirth;
+  createAuthorDto.dateOfDeath = dateOfDeath;
+  createAuthorDto.nationality = nationality;
+  createAuthorDto.biography = biography;
+  return createAuthorDto;
+}

@@ -16,6 +16,14 @@ export class Author {
 
   @Prop({ required: true })
   biography: string;
+
+  constructor(
+    fullName: string,
+    dateOfBirth: Date,
+    dateOfDeath: Date | null,
+    nationality: string,
+    biography: string,
+  ) {}
 }
 
 export const AuthorSchema = SchemaFactory.createForClass(Author);
