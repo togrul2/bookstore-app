@@ -68,7 +68,7 @@ export class AuthService {
 
   public async login(loginDto: LoginDto): Promise<TokenPairEntity> {
     const user = await this.validateUser(loginDto.email, loginDto.password);
-    if (user === null) throw new UnauthorizedException();
+    if (user === null) throw new UnauthorizedException('Invalid credentials.');
     return this.createTokenPair(user);
   }
 

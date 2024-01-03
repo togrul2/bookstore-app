@@ -29,20 +29,6 @@ export class UsersService {
     const errors: ValidationError[] = [];
 
     if (
-      dto.username &&
-      (await this.usersRepository.existsByUsername(dto.username, userId))
-    ) {
-      errors.push({
-        property: 'username',
-        children: [],
-        target: dto,
-        constraints: { unique: 'This username is already taken.' },
-        value: dto.username,
-        contexts: {},
-      });
-    }
-
-    if (
       dto.email &&
       (await this.usersRepository.existsByEmail(dto.email, userId))
     ) {

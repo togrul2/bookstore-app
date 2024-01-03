@@ -4,10 +4,11 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { ErrorDto } from '../app.dto';
+import { ErrorEntity } from '../app.serializers';
 import { AuthService } from './auth.service';
 import { TokenPairEntity } from './auth.entity';
 import { LoginDto, RefreshDto } from './dto/login.dto';
+import { Public } from './auth.guard';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -15,13 +16,14 @@ export class AuthController {
   public constructor(private readonly authService: AuthService) {}
 
   @Post('login')
+  @Public()
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({
     type: TokenPairEntity,
     description: 'Access & refresh token pair.',
   })
   @ApiUnauthorizedResponse({
-    type: ErrorDto,
+    type: ErrorEntity,
     description: 'Invalid credentials.',
   })
   public async login(@Body() loginDto: LoginDto): Promise<TokenPairEntity> {
@@ -29,13 +31,14 @@ export class AuthController {
   }
 
   @Post('refresh')
+  @Public()
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({
     type: TokenPairEntity,
     description: 'Access & refresh token pair.',
   })
   @ApiUnauthorizedResponse({
-    type: ErrorDto,
+    type: ErrorEntity,
     description: 'Invalid refresh token.',
   })
   public async refresh(

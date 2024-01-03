@@ -24,8 +24,9 @@ import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { BookEntity } from './book.serializer';
 import { LocationHeaderInterceptor } from '../app.interceptor';
-import { BadRequestErrorDto, ErrorDto } from '../app.dto';
+import { ErrorEntity } from '../app.serializers';
 import { ObjectIdValidationPipe } from '../app.pipe';
+import { Public } from '../auth/auth.guard';
 
 @Controller('books')
 @ApiTags('books')
@@ -36,7 +37,7 @@ export class BooksController {
   @UseInterceptors(new LocationHeaderInterceptor('api/v1/books'))
   @ApiCreatedResponse({ type: BookEntity, description: 'Book created' })
   @ApiBadRequestResponse({
-    type: BadRequestErrorDto,
+    type: ErrorEntity,
     description: 'Bad request',
   })
   public async create(
@@ -46,13 +47,15 @@ export class BooksController {
   }
 
   @Get()
+  @Public()
   @ApiOkResponse({ type: [BookEntity], description: 'Books found' })
   public async findAll(): Promise<BookEntity[]> {
     return (await this.booksService.findAll()).map(BookEntity.from);
   }
 
   @Get(':id')
-  @ApiNotFoundResponse({ type: ErrorDto, description: 'Book not found' })
+  @Public()
+  @ApiNotFoundResponse({ type: ErrorEntity, description: 'Book not found' })
   @ApiOkResponse({ type: BookEntity, description: 'Book found' })
   public async findOne(
     @Param('id', ObjectIdValidationPipe) id: string,
@@ -62,9 +65,9 @@ export class BooksController {
 
   @Put(':id')
   @ApiOkResponse({ type: BookEntity, description: 'Book updated' })
-  @ApiNotFoundResponse({ type: ErrorDto, description: 'Book not found' })
+  @ApiNotFoundResponse({ type: ErrorEntity, description: 'Book not found' })
   @ApiBadRequestResponse({
-    type: BadRequestErrorDto,
+    type: ErrorEntity,
     description: 'Bad request',
   })
   public async replace(
@@ -76,9 +79,9 @@ export class BooksController {
 
   @Patch(':id')
   @ApiOkResponse({ type: BookEntity, description: 'Book updated' })
-  @ApiNotFoundResponse({ type: ErrorDto, description: 'Book not found' })
+  @ApiNotFoundResponse({ type: ErrorEntity, description: 'Book not found' })
   @ApiBadRequestResponse({
-    type: BadRequestErrorDto,
+    type: ErrorEntity,
     description: 'Bad request',
   })
   public async update(
@@ -89,8 +92,8 @@ export class BooksController {
   }
 
   @Delete(':id')
-  @ApiNoContentResponse({ type: ErrorDto, description: 'Book deleted' })
-  @ApiNotFoundResponse({ type: ErrorDto, description: 'Book not found' })
+  @ApiNoContentResponse({ type: ErrorEntity, description: 'Book deleted' })
+  @ApiNotFoundResponse({ type: ErrorEntity, description: 'Book not found' })
   @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id', ObjectIdValidationPipe) id: string): Promise<void> {
     return this.booksService.remove(id);

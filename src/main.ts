@@ -1,4 +1,4 @@
-import { NestFactory, Reflector } from '@nestjs/core';
+import { HttpAdapterHost, NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import {
@@ -9,22 +9,30 @@ import {
 } from '@nestjs/common';
 import { LoggingInterceptor } from './app.interceptor';
 import { ConfigService } from '@nestjs/config';
+import { HttpExceptionFilter } from './app.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
+  app.enableVersioning({
+    type: VersioningType.URI,
+    defaultVersion: '1',
+  });
   app.setGlobalPrefix('api');
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
       // Custom exception factory is needed for more detailed error response.
-      exceptionFactory: (errors) => new BadRequestException(errors),
+      exceptionFactory: (errors) =>
+        new BadRequestException(
+          errors.map((error) => ({
+            property: error.property,
+            constraints: error.constraints,
+          })),
+        ),
     }),
   );
-  app.enableVersioning({
-    type: VersioningType.URI,
-    defaultVersion: '1',
-  });
+  app.useGlobalFilters(new HttpExceptionFilter(app.get(HttpAdapterHost)));
   app.useGlobalInterceptors(new LoggingInterceptor());
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
   // Swagger doc config builder.

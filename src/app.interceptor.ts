@@ -77,8 +77,8 @@ export class LocationHeaderInterceptor implements NestInterceptor {
     context: ExecutionContext,
     next: CallHandler,
   ): Observable<any> {
-    const request: Request = context.switchToHttp().getRequest();
-    const response: Response = context.switchToHttp().getResponse();
+    const request = context.switchToHttp().getRequest<Request>();
+    const response = context.switchToHttp().getResponse<Response>();
     const fullDomain = `${request.protocol}://${request.headers.host}`;
     return next.handle().pipe(
       tap((data) => {
