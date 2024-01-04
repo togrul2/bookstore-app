@@ -17,9 +17,10 @@ import { AuthorsService } from './authors.service';
 import { CreateAuthorDto } from './dto/create-author.dto';
 import { UpdateAuthorDto } from './dto/update-author.dto';
 import { ObjectIdValidationPipe } from '../app.pipe';
-import { AuthorEntity } from './author.serializer';
+import { AuthorEntity } from './entities/author.entity';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiCreatedResponse,
   ApiForbiddenResponse,
   ApiNoContentResponse,
@@ -27,12 +28,10 @@ import {
   ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { ErrorEntity } from '../app.serializers';
+import { ErrorEntity } from '../app.entity';
 import { LocationHeaderInterceptor } from '../app.interceptor';
 import { Public } from '../auth/auth.guard';
 
-@ApiTags('authors')
-@Controller('authors')
 /**
  * Controller responsible for handling author CRUD operations.
  * @class
@@ -50,6 +49,9 @@ import { Public } from '../auth/auth.guard';
  * @see {@link UpdateAuthorDto}
  * @see {@link ObjectIdValidationPipe}
  */
+@ApiBearerAuth()
+@ApiTags('authors')
+@Controller('authors')
 export class AuthorsController {
   constructor(private readonly authorsService: AuthorsService) {}
 
@@ -65,7 +67,6 @@ export class AuthorsController {
    * @see {@link CreateAuthorDto}
    * @see {@link ObjectIdValidationPipe}
    */
-  @Post()
   @ApiCreatedResponse({ type: AuthorEntity, description: 'Created author.' })
   @ApiBadRequestResponse({
     type: ErrorEntity,
@@ -75,6 +76,7 @@ export class AuthorsController {
     type: ErrorEntity,
     description: 'Forbidden.',
   })
+  @Post()
   @UseInterceptors(new LocationHeaderInterceptor('api/v1/authors'))
   public async create(
     @Body() createAuthorDto: CreateAuthorDto,
@@ -93,9 +95,9 @@ export class AuthorsController {
    * @see {@link CreateAuthorDto}
    * @see {@link ObjectIdValidationPipe}
    */
+  @ApiOkResponse({ type: [AuthorEntity], description: 'Fetched authors.' })
   @Get()
   @Public()
-  @ApiOkResponse({ type: [AuthorEntity], description: 'Fetched authors.' })
   public async findAll(): Promise<AuthorEntity[]> {
     return (await this.authorsService.findAll()).map(AuthorEntity.from);
   }
@@ -139,13 +141,13 @@ export class AuthorsController {
    * @see {@link ObjectIdValidationPipe}
    * @see {@link NotFoundException}
    */
-  @Put(':id')
   @ApiOkResponse({ type: AuthorEntity, description: 'Replaced author.' })
-  @ApiNotFoundResponse({ type: ErrorEntity, description: 'Author not found.' })
   @ApiBadRequestResponse({
     type: ErrorEntity,
     description: 'Bad request.',
   })
+  @ApiNotFoundResponse({ type: ErrorEntity, description: 'Author not found.' })
+  @Put(':id')
   public async replace(
     @Param('id', ObjectIdValidationPipe) id: string,
     @Body() dto: CreateAuthorDto,
@@ -169,13 +171,13 @@ export class AuthorsController {
    * @see {@link NotFoundException}
    * @see {@link BadRequestErrorDto}
    */
-  @Patch(':id')
   @ApiOkResponse({ type: AuthorEntity, description: 'Updated author.' })
   @ApiBadRequestResponse({
     type: ErrorEntity,
     description: 'Bad request.',
   })
   @ApiNotFoundResponse({ type: ErrorEntity, description: 'Author not found.' })
+  @Patch(':id')
   public async update(
     @Param('id', ObjectIdValidationPipe) id: string,
     @Body() dto: UpdateAuthorDto,
@@ -195,9 +197,9 @@ export class AuthorsController {
    * @see {@link ObjectIdValidationPipe}
    * @see {@link NotFoundException}
    */
-  @Delete(':id')
   @ApiNoContentResponse({ description: 'Author deleted.' })
   @ApiNotFoundResponse({ type: ErrorEntity, description: 'Author not found.' })
+  @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   public async remove(
     @Param('id', ObjectIdValidationPipe) id: string,

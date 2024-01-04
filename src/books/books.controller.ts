@@ -13,6 +13,7 @@ import {
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiCreatedResponse,
   ApiNoContentResponse,
   ApiNotFoundResponse,
@@ -22,41 +23,42 @@ import {
 import { BooksService } from './books.service';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
-import { BookEntity } from './book.serializer';
+import { BookEntity } from './entities/book.entity';
 import { LocationHeaderInterceptor } from '../app.interceptor';
-import { ErrorEntity } from '../app.serializers';
+import { ErrorEntity } from '../app.entity';
 import { ObjectIdValidationPipe } from '../app.pipe';
 import { Public } from '../auth/auth.guard';
 
 @Controller('books')
 @ApiTags('books')
+@ApiBearerAuth()
 export class BooksController {
   constructor(private readonly booksService: BooksService) {}
 
-  @Post()
-  @UseInterceptors(new LocationHeaderInterceptor('api/v1/books'))
   @ApiCreatedResponse({ type: BookEntity, description: 'Book created' })
   @ApiBadRequestResponse({
     type: ErrorEntity,
     description: 'Bad request',
   })
+  @Post()
+  @UseInterceptors(new LocationHeaderInterceptor('api/v1/books'))
   public async create(
     @Body() createBookDto: CreateBookDto,
   ): Promise<BookEntity> {
     return BookEntity.from(await this.booksService.create(createBookDto));
   }
 
-  @Get()
   @Public()
+  @Get()
   @ApiOkResponse({ type: [BookEntity], description: 'Books found' })
   public async findAll(): Promise<BookEntity[]> {
     return (await this.booksService.findAll()).map(BookEntity.from);
   }
 
-  @Get(':id')
   @Public()
-  @ApiNotFoundResponse({ type: ErrorEntity, description: 'Book not found' })
+  @Get(':id')
   @ApiOkResponse({ type: BookEntity, description: 'Book found' })
+  @ApiNotFoundResponse({ type: ErrorEntity, description: 'Book not found' })
   public async findOne(
     @Param('id', ObjectIdValidationPipe) id: string,
   ): Promise<BookEntity> {

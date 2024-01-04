@@ -1,11 +1,11 @@
 import {
-  IsDate,
+  IsDateString,
   IsEmail,
+  IsNotEmpty,
+  IsOptional,
   IsString,
-  ValidateIf,
 } from 'class-validator';
-import { Gender } from '../entities/user.entity';
-import { Type } from 'class-transformer';
+import { Gender } from '../users.schema';
 import { PartialType } from '@nestjs/swagger';
 
 export class UpdateUserDto {
@@ -13,14 +13,14 @@ export class UpdateUserDto {
   email: string;
 
   @IsString()
+  @IsNotEmpty()
   fullName: string;
 
   @IsString()
-  @ValidateIf((object, value) => value !== null)
-  gender: Gender | null;
+  @IsOptional()
+  gender?: Gender;
 
-  @Type(() => Date)
-  @IsDate()
+  @IsDateString()
   birthDate: Date;
 }
 

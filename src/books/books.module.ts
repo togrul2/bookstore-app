@@ -3,7 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { BooksService } from './books.service';
 import { BooksController } from './books.controller';
 import { BooksRepository } from './books.repository';
-import { Book, BookSchema } from './entities/book.entity';
+import { Book, BookSchema } from './books.schema';
 
 @Module({
   controllers: [BooksController],

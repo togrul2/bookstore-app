@@ -13,21 +13,23 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { UserEntity } from './users.serializers';
+import { PartialUpdateUserDto, UpdateUserDto } from './dto/update-user.dto';
+import { UserEntity } from './entities/user.entity';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiCreatedResponse,
   ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { ErrorEntity } from '../app.serializers';
+import { ErrorEntity } from '../app.entity';
 import { LocationHeaderInterceptor } from '../app.interceptor';
 import { ObjectIdValidationPipe } from '../app.pipe';
 import { Public } from '../auth/auth.guard';
 
+@ApiBearerAuth()
 @ApiTags('users')
 @Controller('users')
 export class UsersController {
@@ -84,7 +86,7 @@ export class UsersController {
   @ApiNotFoundResponse({ type: ErrorEntity, description: 'User not found' })
   public async update(
     @Param('id', ObjectIdValidationPipe) id: string,
-    @Body() updateUserDto: UpdateUserDto,
+    @Body() updateUserDto: PartialUpdateUserDto,
   ): Promise<UserEntity> {
     return UserEntity.from(await this.usersService.update(id, updateUserDto));
   }

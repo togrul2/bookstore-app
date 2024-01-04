@@ -2,8 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAuthorDto } from './dto/create-author.dto';
 import { UpdateAuthorDto } from './dto/update-author.dto';
 import { AuthorsRepository } from './authors.repository';
-import {Author} from './entities/author.entity';
-
+import { Author } from './author.schema';
 
 /**
  * Service responsible for handling author CRUD operations.

@@ -8,7 +8,7 @@ import {
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersRepository } from './users.repository';
-import { User } from './entities/user.entity';
+import { User } from './users.schema';
 import { compare } from 'bcrypt';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 

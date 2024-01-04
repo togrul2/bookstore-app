@@ -1,5 +1,5 @@
 import { InjectModel } from '@nestjs/mongoose';
-import { Author } from './entities/author.entity';
+import { Author } from './author.schema';
 import { Model, ModifyResult } from 'mongoose';
 import { CreateAuthorDto } from './dto/create-author.dto';
 import { UpdateAuthorDto } from './dto/update-author.dto';

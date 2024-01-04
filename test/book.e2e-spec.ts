@@ -16,6 +16,9 @@ describe('AppController (e2e)', () => {
   });
 
   it('/api/v1/books (GET)', () => {
-    return request(app.getHttpServer()).get('/api/v1/books').expect(200).expect([]);
+    return request(app.getHttpServer())
+      .get('/api/v1/books')
+      .expect(200)
+      .expect([]);
   });
 });

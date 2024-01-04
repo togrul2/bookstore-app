@@ -4,9 +4,9 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { ErrorEntity } from '../app.serializers';
+import { ErrorEntity } from '../app.entity';
 import { AuthService } from './auth.service';
-import { TokenPairEntity } from './auth.entity';
+import { TokenPairEntity } from './entities/token-pair.entity';
 import { LoginDto, RefreshDto } from './dto/login.dto';
 import { Public } from './auth.guard';
 

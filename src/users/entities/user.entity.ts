@@ -1,32 +1,35 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Types } from 'mongoose';
+import { Exclude } from 'class-transformer';
+import { Gender } from '../users.schema';
+import { ApiHideProperty } from '@nestjs/swagger';
 
-export type Gender = 'M' | 'F';
-
-@Schema({ timestamps: true })
-export class User {
-  _id: Types.ObjectId;
-
-  @Prop({ required: true, unique: true, index: true })
+export class UserEntity {
+  id: string;
   email: string;
-
-  @Prop({ required: true })
-  fullName: string;
-
-  @Prop({ type: String })
-  gender: Gender | null;
-
-  @Prop({ required: true })
+  gender?: Gender;
   birthDate: Date;
-
-  @Prop({ required: true })
+  username: string;
+  fullName: string;
+  @Exclude()
+  @ApiHideProperty()
   password: string;
-
-  @Prop({ default: false })
+  @Exclude()
+  @ApiHideProperty()
   isBanned: boolean;
 
-  // @Prop({ typedefault: Role.USER })
-  // role: Role;
-}
+  static from(dto: Partial<UserEntity>): UserEntity {
+    return new UserEntity({
+      id: dto.id,
+      fullName: dto.fullName,
+      username: dto.username,
+      email: dto.email,
+      gender: dto.gender,
+      birthDate: dto.birthDate,
+      password: dto.password,
+      isBanned: dto.isBanned,
+    });
+  }
 
-export const UserSchema = SchemaFactory.createForClass(User);
+  private constructor(source: Partial<UserEntity>) {
+    Object.assign(this, source);
+  }
+}

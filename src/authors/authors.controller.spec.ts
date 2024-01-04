@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthorsController } from './authors.controller';
 import { AuthorsService } from './authors.service';
-import { AuthorEntity } from './author.serializer';
-import { Author } from './entities/author.entity';
+import { AuthorEntity } from './entities/author.entity';
+import { Author } from './author.schema';
 import { ModuleMocker, MockFunctionMetadata } from 'jest-mock';
 import {
   CreateAuthorDto,

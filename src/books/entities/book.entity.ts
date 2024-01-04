@@ -1,15 +1,25 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Expose } from 'class-transformer';
 
-@Schema({ timestamps: true })
-export class Book {
-  @Prop({ required: true })
+export class BookEntity {
+  @Expose()
+  id: string;
+  @Expose()
   title: string;
-
-  @Prop()
+  @Expose()
   author: string;
-
-  @Prop()
+  @Expose()
   publicationYear: number;
-}
 
-export const BookSchema = SchemaFactory.createForClass(Book);
+  static from(item: Partial<BookEntity>): BookEntity {
+    return new BookEntity({
+      id: item.id,
+      title: item.title,
+      author: item.author,
+      publicationYear: item.publicationYear,
+    });
+  }
+
+  private constructor(partial: Partial<BookEntity>) {
+    Object.assign(this, partial);
+  }
+}

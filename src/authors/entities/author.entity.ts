@@ -1,29 +1,32 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Type } from 'class-transformer';
 
-@Schema({ timestamps: true, validateBeforeSave: true })
-export class Author {
-  @Prop({ required: true })
+export class AuthorEntity {
+  id: string;
   fullName: string;
-
-  @Prop({ required: true })
   dateOfBirth: Date;
-
-  @Prop({ default: null, type: Date })
+  @Type(() => Date)
   dateOfDeath: Date | null;
-
-  @Prop({ required: true })
   nationality: string;
-
-  @Prop({ required: true })
   biography: string;
+  @Type(() => Date)
+  createdAt: Date;
+  @Type(() => Date)
+  updatedAt: Date;
 
-  constructor(
-    fullName: string,
-    dateOfBirth: Date,
-    dateOfDeath: Date | null,
-    nationality: string,
-    biography: string,
-  ) {}
+  static from(item: Partial<AuthorEntity>): AuthorEntity {
+    return new AuthorEntity({
+      id: item.id,
+      fullName: item.fullName,
+      dateOfBirth: item.dateOfBirth,
+      dateOfDeath: item.dateOfDeath,
+      nationality: item.nationality,
+      biography: item.biography,
+      createdAt: item.createdAt,
+      updatedAt: item.updatedAt,
+    });
+  }
+
+  private constructor(partial: Partial<AuthorEntity>) {
+    Object.assign(this, partial);
+  }
 }
-
-export const AuthorSchema = SchemaFactory.createForClass(Author);

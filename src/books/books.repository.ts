@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Book } from './entities/book.entity';
 import { Model, ModifyResult } from 'mongoose';
 import { CreateBookDto } from './dto/create-book.dto';
+import { Book } from './books.schema';
 
 @Injectable()
 export class BooksRepository {
@@ -10,7 +10,7 @@ export class BooksRepository {
     @InjectModel(Book.name) private readonly bookModel: Model<Book>,
   ) {}
 
-  public async create(book: CreateBookDto): Promise<Book> {
+  public async create(book: Book): Promise<Book> {
     return new this.bookModel(book).save();
   }
 

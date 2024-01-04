@@ -2,10 +2,10 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { compare } from 'bcrypt';
-import { TokenPairEntity } from './auth.entity';
+import { TokenPairEntity } from './entities/token-pair.entity';
 import { LoginDto } from './dto/login.dto';
 import { UsersRepository } from '../users/users.repository';
-import { User } from '../users/entities/user.entity';
+import { User } from '../users/users.schema';
 
 /**
  * Service responsible for authentication.
