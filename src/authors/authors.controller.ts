@@ -30,7 +30,7 @@ import {
 } from '@nestjs/swagger';
 import { ErrorEntity } from '../app.entity';
 import { LocationHeaderInterceptor } from '../app.interceptor';
-import { Public } from '../auth/auth.guard';
+import { Public } from '../auth/guards/auth.guard';
 
 /**
  * Controller responsible for handling author CRUD operations.

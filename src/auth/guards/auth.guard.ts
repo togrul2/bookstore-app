@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Reflector } from '@nestjs/core';
-import { AuthRequest } from './auth.type';
+import { AuthRequest } from '../auth.type';
 
 export const IS_PUBLIC_KEY = 'isPublic';
 export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
@@ -26,8 +26,8 @@ export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
 @Injectable()
 export class AuthGuard implements CanActivate {
   public constructor(
-    private readonly jwtService: JwtService,
-    private readonly reflector: Reflector,
+    protected readonly jwtService: JwtService,
+    protected readonly reflector: Reflector,
   ) {}
 
   public async canActivate(context: ExecutionContext): Promise<boolean> {

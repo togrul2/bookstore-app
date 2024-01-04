@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Types } from 'mongoose';
+import { Role } from '../auth/role.enum';
 
 export enum Gender {
   MALE = 'M',
@@ -27,6 +28,9 @@ export class User {
 
   @Prop({ default: false })
   isBanned: boolean;
+
+  @Prop({ default: [Role.USER] })
+  roles: Role[] = [Role.USER];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

@@ -23,11 +23,16 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { ErrorEntity } from '../app.entity';
 import { LocationHeaderInterceptor } from '../app.interceptor';
 import { ObjectIdValidationPipe } from '../app.pipe';
-import { Public } from '../auth/auth.guard';
+import { Public } from '../auth/guards/auth.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { Role } from '../auth/role.enum';
+import { AuthUser } from '../auth/decorators/auth.decorator';
+import { RequestUser } from '../auth/auth.type';
 
 @ApiBearerAuth()
 @ApiTags('users')
@@ -94,10 +99,76 @@ export class UsersController {
   @Delete(':id')
   @ApiNoContentResponse({ description: 'Deleted user' })
   @ApiNotFoundResponse({ type: ErrorEntity, description: 'User not found' })
+  @Roles(Role.ADMIN, Role.MODERATOR)
   @HttpCode(HttpStatus.NO_CONTENT)
   public async remove(
     @Param('id', ObjectIdValidationPipe) id: string,
   ): Promise<void> {
     await this.usersService.remove(id);
+  }
+}
+
+/**
+ * Controller responsible for managing current user.
+ * @version 1.0.0
+ * @see UsersService
+ * @see UserEntity
+ * @see UpdateUserDto
+ * @see PartialUpdateUserDto
+ * @see RequestUser
+ * @see AuthUser
+ */
+@ApiBearerAuth()
+@ApiTags('users')
+@Controller('users/me')
+@ApiUnauthorizedResponse({
+  type: ErrorEntity,
+  description: 'Not authenticated',
+})
+@ApiNotFoundResponse({ type: ErrorEntity, description: 'User not found' })
+export class UsersMeController {
+  public constructor(private readonly usersService: UsersService) {}
+
+  @Get()
+  @ApiOkResponse({ type: UserEntity, description: 'Fetched user' })
+  public async findOne(@AuthUser() user: RequestUser): Promise<UserEntity> {
+    return UserEntity.from(await this.usersService.findOne(user.id));
+  }
+
+  @Put()
+  @ApiOkResponse({ type: UserEntity, description: 'Updated user' })
+  @ApiBadRequestResponse({
+    type: ErrorEntity,
+    description: 'Validation error',
+  })
+  public async replace(
+    @AuthUser() user: RequestUser,
+    @Body() updateUserDto: UpdateUserDto,
+  ): Promise<UserEntity> {
+    return UserEntity.from(
+      await this.usersService.update(user.id, updateUserDto),
+    );
+  }
+
+  @Patch()
+  @ApiOkResponse({ type: UserEntity, description: 'Updated user' })
+  @ApiBadRequestResponse({
+    type: ErrorEntity,
+    description: 'Validation error',
+  })
+  public async update(
+    @AuthUser() user: RequestUser,
+    @Body() updateUserDto: PartialUpdateUserDto,
+  ): Promise<UserEntity> {
+    return UserEntity.from(
+      await this.usersService.update(user.id, updateUserDto),
+    );
+  }
+
+  @Delete()
+  @ApiNoContentResponse({ description: 'Deleted user' })
+  @HttpCode(HttpStatus.NO_CONTENT)
+  public async remove(@AuthUser() user: RequestUser): Promise<void> {
+    await this.usersService.remove(user.id);
   }
 }

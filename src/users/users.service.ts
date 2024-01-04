@@ -34,11 +34,7 @@ export class UsersService {
     ) {
       errors.push({
         property: 'email',
-        children: [],
-        target: dto,
-        constraints: { unique: 'This email is already taken.' },
-        contexts: {},
-        value: dto.email,
+        constraints: { Unique: 'This email is already taken.' },
       });
     }
 

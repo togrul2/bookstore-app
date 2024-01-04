@@ -27,7 +27,7 @@ import { BookEntity } from './entities/book.entity';
 import { LocationHeaderInterceptor } from '../app.interceptor';
 import { ErrorEntity } from '../app.entity';
 import { ObjectIdValidationPipe } from '../app.pipe';
-import { Public } from '../auth/auth.guard';
+import { Public } from '../auth/guards/auth.guard';
 
 @Controller('books')
 @ApiTags('books')

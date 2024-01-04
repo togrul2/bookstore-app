@@ -1,13 +1,13 @@
 import { Exclude } from 'class-transformer';
 import { Gender } from '../users.schema';
 import { ApiHideProperty } from '@nestjs/swagger';
+import { Role } from '../../auth/role.enum';
 
 export class UserEntity {
   id: string;
   email: string;
   gender?: Gender;
   birthDate: Date;
-  username: string;
   fullName: string;
   @Exclude()
   @ApiHideProperty()
@@ -15,17 +15,18 @@ export class UserEntity {
   @Exclude()
   @ApiHideProperty()
   isBanned: boolean;
+  roles: Role[];
 
-  static from(dto: Partial<UserEntity>): UserEntity {
+  public static from(dto: Partial<UserEntity>): UserEntity {
     return new UserEntity({
       id: dto.id,
       fullName: dto.fullName,
-      username: dto.username,
       email: dto.email,
       gender: dto.gender,
       birthDate: dto.birthDate,
       password: dto.password,
       isBanned: dto.isBanned,
+      roles: dto.roles,
     });
   }
 

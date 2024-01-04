@@ -17,13 +17,6 @@ export class UsersRepository {
     return this.userModel.findById(id).select(['-__v']).exec();
   }
 
-  public async existsByUsername(
-    username: string,
-    userId: string | null,
-  ): Promise<boolean> {
-    return !!(await this.userModel.exists({ username, _id: { $ne: userId } }));
-  }
-
   public async existsByEmail(
     email: string,
     userId: string | null,

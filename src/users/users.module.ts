@@ -1,15 +1,15 @@
 import { Module } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { UsersController } from './users.controller';
+import { UsersController, UsersMeController } from './users.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { genSalt, hash } from 'bcrypt';
 import { UsersRepository } from './users.repository';
 import { User, UserSchema } from './users.schema';
 
 @Module({
-  controllers: [UsersController],
+  controllers: [UsersMeController, UsersController],
   providers: [UsersService, UsersRepository],
-  exports: [UsersRepository],
+  exports: [UsersService, UsersRepository],
   imports: [
     MongooseModule.forFeatureAsync([
       {

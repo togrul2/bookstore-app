@@ -77,10 +77,11 @@ export class AuthService {
       this.jwtService.signAsync({
         id: user._id,
         email: user.email,
+        roles: user.roles,
         type: 'access',
       }),
       this.jwtService.signAsync(
-        { id: user._id, email: user.email, type: 'refresh' },
+        { id: user._id, type: 'refresh' },
         {
           expiresIn: this.configService.get<string>('JWT_REFRESH_TOKEN_TTL'),
         },
