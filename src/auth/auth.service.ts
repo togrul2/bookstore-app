@@ -5,7 +5,7 @@ import { compare } from 'bcrypt';
 import { TokenPairEntity } from './entities/token-pair.entity';
 import { LoginDto } from './dto/login.dto';
 import { UsersRepository } from '../users/users.repository';
-import { User } from '../users/users.schema';
+import { User } from '../users/schema/user.schema';
 
 /**
  * Service responsible for authentication.

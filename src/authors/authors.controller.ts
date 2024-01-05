@@ -17,7 +17,6 @@ import { AuthorsService } from './authors.service';
 import { CreateAuthorDto } from './dto/create-author.dto';
 import { UpdateAuthorDto } from './dto/update-author.dto';
 import { ObjectIdValidationPipe } from '../app.pipe';
-import { AuthorEntity } from './entities/author.entity';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
@@ -31,6 +30,7 @@ import {
 import { ErrorEntity } from '../app.entity';
 import { LocationHeaderInterceptor } from '../app.interceptor';
 import { Public } from '../auth/guards/auth.guard';
+import { AuthorEntity } from './entities/author.entity';
 
 /**
  * Controller responsible for handling author CRUD operations.
@@ -53,13 +53,13 @@ import { Public } from '../auth/guards/auth.guard';
 @ApiTags('authors')
 @Controller('authors')
 export class AuthorsController {
-  constructor(private readonly authorsService: AuthorsService) {}
+  public constructor(private readonly authorsService: AuthorsService) {}
 
   /**
    * Creates new author.
    * @public
    * @param {CreateAuthorDto} createAuthorDto - DTO for creating author.
-   * @returns {Promise<AuthorEntity>} Created author.
+   * @returns {Promise<Author>} Created author.
    * @example Creating author
    * const author = await authorsController.create(dto);
    * @see {@link AuthorsService}
@@ -81,7 +81,9 @@ export class AuthorsController {
   public async create(
     @Body() createAuthorDto: CreateAuthorDto,
   ): Promise<AuthorEntity> {
-    return AuthorEntity.from(await this.authorsService.create(createAuthorDto));
+    return AuthorEntity.fromInstance(
+      await this.authorsService.create(createAuthorDto),
+    );
   }
 
   /**
@@ -99,7 +101,7 @@ export class AuthorsController {
   @Get()
   @Public()
   public async findAll(): Promise<AuthorEntity[]> {
-    return (await this.authorsService.findAll()).map(AuthorEntity.from);
+    return (await this.authorsService.findAll()).map(AuthorEntity.fromInstance);
   }
 
   /**
@@ -107,7 +109,7 @@ export class AuthorsController {
    * @public
    * @param {string} id - Author id.
    * @throws {NotFoundException} Author not found.
-   * @returns {Promise<AuthorEntity>} Author.
+   * @returns {Promise<Author>} Author.
    * @example Getting author by id
    * const author = await authorsController.findOne(id);
    * @see {@link AuthorsService}
@@ -123,7 +125,7 @@ export class AuthorsController {
   public async findOne(
     @Param('id', ObjectIdValidationPipe) id: string,
   ): Promise<AuthorEntity> {
-    return AuthorEntity.from(await this.authorsService.findOne(id));
+    return AuthorEntity.fromInstance(await this.authorsService.findOne(id));
   }
 
   /**
@@ -132,7 +134,7 @@ export class AuthorsController {
    * @param {string} id - Author id.
    * @param {CreateAuthorDto} dto - DTO for replacing author.
    * @throws {NotFoundException} Author not found.
-   * @returns {Promise<AuthorEntity>} Replaced author.
+   * @returns {Promise<Author>} Replaced author.
    * @example Replacing author by id
    * const author = await authorsController.replace(id, dto);
    * @see {@link AuthorsService}
@@ -152,7 +154,7 @@ export class AuthorsController {
     @Param('id', ObjectIdValidationPipe) id: string,
     @Body() dto: CreateAuthorDto,
   ): Promise<AuthorEntity> {
-    return AuthorEntity.from(await this.authorsService.update(id, dto));
+    return AuthorEntity.fromInstance(await this.authorsService.update(id, dto));
   }
 
   /**
@@ -161,7 +163,7 @@ export class AuthorsController {
    * @param {string} id - Author id.
    * @param {UpdateAuthorDto} dto - DTO for updating author.
    * @throws {NotFoundException} Author not found.
-   * @returns {Promise<AuthorEntity>} Updated author.
+   * @returns {Promise<Author>} Updated author.
    * @example Updating author by id
    * const author = await authorsController.update(id, dto);
    * @see {@link AuthorsService}
@@ -182,7 +184,7 @@ export class AuthorsController {
     @Param('id', ObjectIdValidationPipe) id: string,
     @Body() dto: UpdateAuthorDto,
   ): Promise<AuthorEntity> {
-    return AuthorEntity.from(await this.authorsService.update(id, dto));
+    return AuthorEntity.fromInstance(await this.authorsService.update(id, dto));
   }
 
   /**

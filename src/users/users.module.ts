@@ -4,7 +4,7 @@ import { UsersController, UsersMeController } from './users.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { genSalt, hash } from 'bcrypt';
 import { UsersRepository } from './users.repository';
-import { User, UserSchema } from './users.schema';
+import { User, UserSchema } from './schema/user.schema';
 
 @Module({
   controllers: [UsersMeController, UsersController],

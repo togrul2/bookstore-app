@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ModifyResult } from 'mongoose';
-import { User } from './users.schema';
+import { User } from './schema/user.schema';
 
 @Injectable()
 export class UsersRepository {
@@ -10,38 +10,41 @@ export class UsersRepository {
   ) {}
 
   public async getUsers(): Promise<User[]> {
-    return this.userModel.find().select(['-__v']).exec();
+    return this.userModel.find().select('-__v').lean().exec();
   }
 
   public async getUserById(id: string): Promise<User | null> {
-    return this.userModel.findById(id).select(['-__v']).exec();
+    return this.userModel.findById(id).select('-__v').lean().exec();
   }
 
-  public async existsByEmail(
-    email: string,
-    userId: string | null,
-  ): Promise<boolean> {
-    return !!(await this.userModel.exists({ email, _id: { $ne: userId } }));
+  public async existsByEmail(email: string, userId?: string): Promise<boolean> {
+    return !!(await this.userModel
+      .exists({ email, _id: { $ne: userId } })
+      .exec());
   }
 
   public async createUser(createUserDto: Partial<User>): Promise<User> {
-    return new this.userModel(createUserDto, ['-__v']).save();
+    return new this.userModel(createUserDto, '-__v', { lean: true }).save();
   }
 
   public async getUserByEmail(email: string): Promise<User | null> {
-    return this.userModel.findOne({ email }).select(['-__v']).exec();
+    return this.userModel.findOne({ email }).select('-__v').lean().exec();
   }
 
   public async updateUser(
     id: string,
     updateUserDto: Partial<User>,
   ): Promise<User | null> {
-    return this.userModel.findByIdAndUpdate(id, updateUserDto, {
-      fields: ['-__v'],
-    });
+    return this.userModel
+      .findByIdAndUpdate(id, updateUserDto, {
+        fields: '-__v',
+        new: true,
+      })
+      .lean()
+      .exec();
   }
 
   public async deleteUser(id: string): Promise<ModifyResult<User>> {
-    return this.userModel.findByIdAndDelete(id);
+    return this.userModel.findByIdAndDelete(id).exec();
   }
 }

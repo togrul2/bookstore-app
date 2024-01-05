@@ -1,29 +1,35 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
 
 @Schema({ timestamps: true, validateBeforeSave: true })
-export class Author {
-  @Prop({ required: true })
-  fullName: string;
+export class Author extends Document {
+  @Prop()
+  fullName!: string;
 
-  @Prop({ required: true })
-  dateOfBirth: Date;
+  @Prop()
+  dateOfBirth!: Date;
 
-  @Prop({ default: null, type: Date })
-  dateOfDeath: Date | null;
+  @Prop()
+  dateOfDeath?: Date;
 
-  @Prop({ required: true })
-  nationality: string;
+  @Prop()
+  nationality!: string;
 
-  @Prop({ required: true })
-  biography: string;
+  @Prop()
+  biography!: string;
+
+  createdAt: Date;
+
+  updatedAt: Date;
 
   constructor(
     fullName: string,
     dateOfBirth: Date,
-    dateOfDeath: Date | null,
+    dateOfDeath: Date | undefined,
     nationality: string,
     biography: string,
   ) {
+    super();
     this.fullName = fullName;
     this.dateOfBirth = dateOfBirth;
     this.dateOfDeath = dateOfDeath;
@@ -33,3 +39,8 @@ export class Author {
 }
 
 export const AuthorSchema = SchemaFactory.createForClass(Author);
+AuthorSchema.virtual('books', {
+  ref: 'Book',
+  localField: '_id',
+  foreignField: 'author',
+});

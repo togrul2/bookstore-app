@@ -1,36 +1,58 @@
-import { Exclude } from 'class-transformer';
-import { Gender } from '../users.schema';
-import { ApiHideProperty } from '@nestjs/swagger';
+import { Gender } from '../users.type';
 import { Role } from '../../auth/role.enum';
+import { User } from '../schema/user.schema';
+import { Exclude } from 'class-transformer';
 
 export class UserEntity {
-  id: string;
-  email: string;
-  gender?: Gender;
-  birthDate: Date;
-  fullName: string;
+  readonly id: string;
+  readonly email: string;
+  readonly fullName: string;
+  readonly gender?: Gender;
+  readonly birthDate: Date;
   @Exclude()
-  @ApiHideProperty()
-  password: string;
+  readonly password: string;
   @Exclude()
-  @ApiHideProperty()
-  isBanned: boolean;
-  roles: Role[];
+  readonly isBanned: boolean;
+  readonly roles: Role[];
+  readonly createdAt: Date;
+  readonly updatedAt: Date;
 
-  public static from(dto: Partial<UserEntity>): UserEntity {
-    return new UserEntity({
-      id: dto.id,
-      fullName: dto.fullName,
-      email: dto.email,
-      gender: dto.gender,
-      birthDate: dto.birthDate,
-      password: dto.password,
-      isBanned: dto.isBanned,
-      roles: dto.roles,
-    });
+  public static fromInstance(user: User): UserEntity {
+    return new UserEntity(
+      user.id,
+      user.email,
+      user.fullName,
+      user.gender,
+      user.birthDate,
+      user.password,
+      user.isBanned,
+      user.roles,
+      user.createdAt,
+      user.updatedAt,
+    );
   }
 
-  private constructor(source: Partial<UserEntity>) {
-    Object.assign(this, source);
+  private constructor(
+    id: string,
+    email: string,
+    fullName: string,
+    gender: Gender | undefined,
+    birthDate: Date,
+    password: string,
+    isBanned: boolean,
+    roles: Role[],
+    createdAt: Date,
+    updatedAt: Date,
+  ) {
+    this.id = id;
+    this.email = email;
+    this.fullName = fullName;
+    this.gender = gender;
+    this.birthDate = birthDate;
+    this.password = password;
+    this.isBanned = isBanned;
+    this.roles = roles;
+    this.createdAt = createdAt;
+    this.updatedAt = updatedAt;
   }
 }

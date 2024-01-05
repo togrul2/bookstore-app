@@ -16,7 +16,7 @@ export class CreateAuthorDto {
 
   @IsDateString()
   @IsOptional()
-  dateOfDeath: Date | null;
+  dateOfDeath?: Date;
 
   @IsString()
   nationality: string;
@@ -28,7 +28,7 @@ export class CreateAuthorDto {
 export function createAuthorDtoFactory(
   fullName: string,
   dateOfBirth: Date,
-  dateOfDeath: Date | null,
+  dateOfDeath: Date | undefined,
   nationality: string,
   biography: string,
 ) {

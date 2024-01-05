@@ -1,32 +1,45 @@
-import { Type } from 'class-transformer';
+import { Author } from '../schemas/author.schema';
 
 export class AuthorEntity {
-  id: string;
-  fullName: string;
-  dateOfBirth: Date;
-  @Type(() => Date)
-  dateOfDeath: Date | null;
-  nationality: string;
-  biography: string;
-  @Type(() => Date)
-  createdAt: Date;
-  @Type(() => Date)
-  updatedAt: Date;
+  readonly id: string;
+  readonly fullName: string;
+  readonly dateOfBirth: Date;
+  readonly dateOfDeath?: Date;
+  readonly nationality: string;
+  readonly biography: string;
+  readonly createdAt: Date;
+  readonly updatedAt: Date;
 
-  static from(item: Partial<AuthorEntity>): AuthorEntity {
-    return new AuthorEntity({
-      id: item.id,
-      fullName: item.fullName,
-      dateOfBirth: item.dateOfBirth,
-      dateOfDeath: item.dateOfDeath,
-      nationality: item.nationality,
-      biography: item.biography,
-      createdAt: item.createdAt,
-      updatedAt: item.updatedAt,
-    });
+  public static fromInstance(instance: Author): AuthorEntity {
+    return new AuthorEntity(
+      instance._id.toHexString(),
+      instance.fullName,
+      instance.dateOfBirth,
+      instance.dateOfDeath,
+      instance.nationality,
+      instance.biography,
+      instance.createdAt,
+      instance.updatedAt,
+    );
   }
 
-  private constructor(partial: Partial<AuthorEntity>) {
-    Object.assign(this, partial);
+  private constructor(
+    id: string,
+    fullName: string,
+    dateOfBirth: Date,
+    dateOfDeath: Date | undefined,
+    nationality: string,
+    biography: string,
+    createdAt: Date,
+    updatedAt: Date,
+  ) {
+    this.id = id;
+    this.fullName = fullName;
+    this.dateOfBirth = dateOfBirth;
+    this.dateOfDeath = dateOfDeath;
+    this.nationality = nationality;
+    this.biography = biography;
+    this.createdAt = createdAt;
+    this.updatedAt = updatedAt;
   }
 }

@@ -15,6 +15,7 @@ import {
   ApiBadRequestResponse,
   ApiBearerAuth,
   ApiCreatedResponse,
+  ApiForbiddenResponse,
   ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -23,81 +24,112 @@ import {
 import { BooksService } from './books.service';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
-import { BookEntity } from './entities/book.entity';
 import { LocationHeaderInterceptor } from '../app.interceptor';
 import { ErrorEntity } from '../app.entity';
 import { ObjectIdValidationPipe } from '../app.pipe';
 import { Public } from '../auth/guards/auth.guard';
+import { BookEntity } from './entities/book.entity';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { Role } from '../auth/role.enum';
 
 @Controller('books')
 @ApiTags('books')
 @ApiBearerAuth()
 export class BooksController {
-  constructor(private readonly booksService: BooksService) {}
+  public constructor(private readonly booksService: BooksService) {}
 
   @ApiCreatedResponse({ type: BookEntity, description: 'Book created' })
   @ApiBadRequestResponse({
     type: ErrorEntity,
     description: 'Bad request',
   })
+  @ApiForbiddenResponse({
+    type: ErrorEntity,
+    description: 'Forbidden',
+  })
   @Post()
+  @Roles(Role.MODERATOR, Role.LIBRARIAN)
   @UseInterceptors(new LocationHeaderInterceptor('api/v1/books'))
   public async create(
     @Body() createBookDto: CreateBookDto,
   ): Promise<BookEntity> {
-    return BookEntity.from(await this.booksService.create(createBookDto));
+    return BookEntity.fromInstance(
+      await this.booksService.create(createBookDto),
+    );
   }
 
+  @ApiOkResponse({ type: [BookEntity], description: 'Books found' })
   @Public()
   @Get()
   @ApiOkResponse({ type: [BookEntity], description: 'Books found' })
   public async findAll(): Promise<BookEntity[]> {
-    return (await this.booksService.findAll()).map(BookEntity.from);
+    return (await this.booksService.findAll()).map(BookEntity.fromInstance);
   }
 
-  @Public()
-  @Get(':id')
   @ApiOkResponse({ type: BookEntity, description: 'Book found' })
   @ApiNotFoundResponse({ type: ErrorEntity, description: 'Book not found' })
+  @Public()
+  @Get(':id')
   public async findOne(
     @Param('id', ObjectIdValidationPipe) id: string,
   ): Promise<BookEntity> {
-    return BookEntity.from(await this.booksService.findOne(id));
+    return BookEntity.fromInstance(await this.booksService.findOne(id));
   }
 
-  @Put(':id')
   @ApiOkResponse({ type: BookEntity, description: 'Book updated' })
-  @ApiNotFoundResponse({ type: ErrorEntity, description: 'Book not found' })
   @ApiBadRequestResponse({
     type: ErrorEntity,
     description: 'Bad request',
   })
+  @ApiForbiddenResponse({
+    type: ErrorEntity,
+    description: 'Forbidden',
+  })
+  @ApiNotFoundResponse({ type: ErrorEntity, description: 'Book not found' })
+  @Roles(Role.MODERATOR, Role.LIBRARIAN)
+  @Put(':id')
   public async replace(
     @Param('id', ObjectIdValidationPipe) id: string,
     @Body() updateBookDto: CreateBookDto,
   ): Promise<BookEntity> {
-    return BookEntity.from(await this.booksService.update(id, updateBookDto));
+    return BookEntity.fromInstance(
+      await this.booksService.update(id, updateBookDto),
+    );
   }
 
-  @Patch(':id')
   @ApiOkResponse({ type: BookEntity, description: 'Book updated' })
-  @ApiNotFoundResponse({ type: ErrorEntity, description: 'Book not found' })
   @ApiBadRequestResponse({
     type: ErrorEntity,
     description: 'Bad request',
   })
+  @ApiForbiddenResponse({
+    type: ErrorEntity,
+    description: 'Forbidden',
+  })
+  @ApiNotFoundResponse({ type: ErrorEntity, description: 'Book not found' })
+  @Roles(Role.MODERATOR, Role.LIBRARIAN)
+  @Patch(':id')
   public async update(
     @Param('id', ObjectIdValidationPipe) id: string,
     @Body() updateBookDto: UpdateBookDto,
   ): Promise<BookEntity> {
-    return BookEntity.from(await this.booksService.update(id, updateBookDto));
+    return BookEntity.fromInstance(
+      await this.booksService.update(id, updateBookDto),
+    );
   }
 
-  @Delete(':id')
   @ApiNoContentResponse({ type: ErrorEntity, description: 'Book deleted' })
+  @ApiForbiddenResponse({
+    type: ErrorEntity,
+    description: 'Forbidden',
+  })
   @ApiNotFoundResponse({ type: ErrorEntity, description: 'Book not found' })
+  @Roles(Role.MODERATOR, Role.LIBRARIAN)
+  @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id', ObjectIdValidationPipe) id: string): Promise<void> {
-    return this.booksService.remove(id);
+  public async remove(
+    @Param('id', ObjectIdValidationPipe) id: string,
+  ): Promise<void> {
+    await this.booksService.remove(id);
   }
 }

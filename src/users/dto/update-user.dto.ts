@@ -5,8 +5,8 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
-import { Gender } from '../users.schema';
 import { PartialType } from '@nestjs/swagger';
+import { Gender } from '../users.type';
 
 export class UpdateUserDto {
   @IsEmail()

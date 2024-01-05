@@ -1,14 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthorsController } from './authors.controller';
 import { AuthorsService } from './authors.service';
-import { AuthorEntity } from './entities/author.entity';
-import { Author } from './author.schema';
+import { Author } from './schemas/author.schema';
 import { ModuleMocker, MockFunctionMetadata } from 'jest-mock';
 import {
   CreateAuthorDto,
   createAuthorDtoFactory,
 } from './dto/create-author.dto';
 import { UpdateAuthorDto } from './dto/update-author.dto';
+import { AuthorEntity } from './entities/author.entity';
 
 const moduleMocker = new ModuleMocker(global);
 
@@ -92,7 +92,7 @@ describe('AuthorsController', () => {
   describe('findAll', () => {
     it('should return an array of authors', async () => {
       expect(await controller.findAll()).toStrictEqual(
-        authors.map(AuthorEntity.from),
+        authors.map(AuthorEntity.fromInstance),
       );
     });
   });
@@ -100,7 +100,7 @@ describe('AuthorsController', () => {
   describe('findOne', () => {
     it('should return an author', async () => {
       expect(await controller.findOne('1')).toStrictEqual(
-        AuthorEntity.from(authors[1]),
+        AuthorEntity.fromInstance(authors[1]),
       );
     });
   });
@@ -115,7 +115,7 @@ describe('AuthorsController', () => {
         'John Doe is a famous American author.',
       );
       expect(await controller.create(dto)).toStrictEqual(
-        AuthorEntity.from(
+        AuthorEntity.fromInstance(
           new Author(
             'John Doe',
             new Date('1960-01-01'),
@@ -138,7 +138,7 @@ describe('AuthorsController', () => {
         'John Doe is a famous American author.',
       );
       expect(await controller.replace('1', dto)).toStrictEqual(
-        AuthorEntity.from(
+        AuthorEntity.fromInstance(
           new Author(
             'John Doe',
             new Date('1960-01-01'),
@@ -157,7 +157,7 @@ describe('AuthorsController', () => {
       dto.fullName = 'Jack Doe';
       dto.biography = 'Jack Doe is a famous American author.';
       expect(await controller.update('1', dto)).toStrictEqual(
-        AuthorEntity.from(
+        AuthorEntity.fromInstance(
           new Author(
             'Jack Doe',
             new Date('1960-01-01'),

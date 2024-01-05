@@ -8,7 +8,7 @@ import {
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersRepository } from './users.repository';
-import { User } from './users.schema';
+import { User } from './schema/user.schema';
 import { compare } from 'bcrypt';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 
@@ -24,7 +24,7 @@ export class UsersService {
    */
   private async validateUserData(
     dto: Partial<CreateUserDto>,
-    userId: string | null = null,
+    userId?: string,
   ): Promise<void> {
     const errors: ValidationError[] = [];
 
